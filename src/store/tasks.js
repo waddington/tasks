@@ -828,6 +828,20 @@ const actions = {
 			.catch((error) => { throw error })
 	},
 
+	async moveTaskToParent(context, { task, parentId }) {
+		// If a task has a parent task which is not moved, remove the reference to it.
+		if (task.related !== parentId) {
+			// Remove the task from the parents subtask list
+			context.commit('deleteTaskFromParent', task)
+			// Unlink the related parent task
+			context.commit('setTaskParent', { task: task, related: parentId })
+			// Add task to new parent
+			context.commit('addTaskToParent', { task: task })
+			// We have to send an update.
+			await context.dispatch('scheduleTaskUpdate', task)
+		}
+	},
+
 	/**
 	 * Moves a task to the provided calendar
 	 *
@@ -848,16 +862,7 @@ const actions = {
 			}))
 
 			// If a task has a parent task which is not moved, remove the reference to it.
-			if (task.related !== parentId) {
-				// Remove the task from the parents subtask list
-				context.commit('deleteTaskFromParent', task)
-				// Unlink the related parent task
-				context.commit('setTaskParent', { task: task, related: parentId })
-				// Add task to new parent
-				context.commit('addTaskToParent', { task: task })
-				// We have to send an update.
-				await context.dispatch('updateTask', task)
-			}
+			await context.dispatch('moveTaskToParent', { task: task, parentId: parentId })
 
 			await task.dav.move(calendar.dav)
 				.then((response) => {
