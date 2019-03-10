@@ -828,6 +828,18 @@ const actions = {
 			.catch((error) => { throw error })
 	},
 
+	async moveTask(context, { task, parentId, calendarId, collectionId }) {
+
+	},
+
+	/**
+	 * Moves a task to the new parent
+	 *
+	 * @param {Object} context The store mutations
+	 * @param {Object} data Destructuring object
+	 * @param {Task} data.task The task to move
+	 * @param {Calendar} data.parentId The id of the new parent
+	 */
 	async moveTaskToParent(context, { task, parentId }) {
 		// If a task has a parent task which is not moved, remove the reference to it.
 		if (task.related !== parentId) {
@@ -849,7 +861,7 @@ const actions = {
 	 * @param {Object} data Destructuring object
 	 * @param {Task} data.task The task to move
 	 * @param {Calendar} data.calendar The calendar to move the task to
-	 * @param {Boolean} data.removeParent If the task has a parent, remove the link to the parent
+	 * @param {Boolean} data.parentId The id of the new parent
 	 * @returns {Task} The moved task
 	 */
 	async moveTaskToCalendar(context, { task, calendar, parentId = null }) {
